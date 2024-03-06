@@ -1,10 +1,12 @@
 import React, { useState, useContext } from "react";
-import { Modal, StyleSheet, Text, Pressable, View, FlatList } from "react-native";
+import { Modal, StyleSheet, Text, Pressable, View, FlatList, Button } from "react-native";
 import { DataContext } from "../Context/DataContext";
 
 const ModalComponent = () => {
   const { cart, setCart, buyProducts } = useContext(DataContext);
   const [modalVisible, setModalVisible] = useState(false);
+  const [purchasing, setPurchasing] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
 
   const total = cart.reduce((acc, el) => acc + el.quanty * el.price, 0);
 
@@ -12,7 +14,7 @@ const ModalComponent = () => {
     buyProducts(product);
   };
 
-  const handleDreasePress = (product) => {
+  const handleDecreasePress = (product) => {
     const productRepeat = cart.find((item) => item.id === product.id);
 
     productRepeat.quanty !== 1 &&
@@ -23,9 +25,27 @@ const ModalComponent = () => {
     setCart(cart.filter((item) => item.id !== product.id));
   };
 
+  const handlePurchasePress = () => {
+    // Add logic to handle the purchase
+    setPurchasing(true);
+
+    // Reiniciar el carrito
+    setCart([]);
+    setCartOpen(false); // Cerrar el carrito después de la compra
+  };
+
+  const handleModalToggle = () => {
+    // Alternar entre abrir y cerrar el carrito
+    setModalVisible(!modalVisible);
+    setCartOpen(!cartOpen);
+
+    // Reiniciar el estado de compra al abrir el carrito
+    setPurchasing(false);
+  };
+
   return (
     <View>
-      <Pressable style={styles.modalButton} onPress={() => setModalVisible(true)}>
+      <Pressable style={styles.modalButton} onPress={handleModalToggle}>
         <Text style={styles.cartIcon}>🛒</Text>
       </Pressable>
       <Modal
@@ -33,11 +53,11 @@ const ModalComponent = () => {
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => {
-          setModalVisible(!modalVisible);
+          setModalVisible(false);
         }}>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <Pressable style={[styles.button, styles.buttonClose]} onPress={() => setModalVisible(!modalVisible)}>
+            <Pressable style={[styles.button, styles.buttonClose]} onPress={handleModalToggle}>
               <Text style={styles.textStyle}>❌</Text>
             </Pressable>
             <Text style={styles.modalText}>Tus Productos:</Text>
@@ -48,7 +68,7 @@ const ModalComponent = () => {
                   <Text style={styles.modalTextProduct}>{item.productName}</Text>
 
                   <View style={styles.quantityContainer}>
-                    <Pressable style={styles.quantityButton} onPress={() => handleDreasePress(item)}>
+                    <Pressable style={styles.quantityButton} onPress={() => handleDecreasePress(item)}>
                       <Text style={styles.quantityButtonText}>➖</Text>
                     </Pressable>
 
@@ -70,12 +90,21 @@ const ModalComponent = () => {
               keyExtractor={(item) => item.id}
             />
             <Text style={styles.totalText}>Total: ${total}</Text>
+
+            {/* Button for making a purchase */}
+            {!purchasing && (
+              <Button title="Realizar Compra" onPress={handlePurchasePress} color="#1bcb7f" />
+            )}
+
+            {/* Display purchase success message */}
+            {purchasing && <Text style={styles.purchaseSuccess}>Compra realizada con éxito!</Text>}
           </View>
         </View>
       </Modal>
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   centeredView: {
@@ -168,6 +197,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#1bcb7f",
   },
+  purchaseSuccess: {
+    marginTop: 10,
+    fontSize: 18,
+    color: "#1bcb7f",
+  },
 });
-
 export default ModalComponent;
