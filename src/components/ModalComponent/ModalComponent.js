@@ -1,6 +1,9 @@
 import React, { useState, useContext } from "react";
 import { Modal, StyleSheet, Text, Pressable, View, FlatList, Button } from "react-native";
 import { DataContext } from "../Context/DataContext";
+//import SendIntentIos from "react-native-send-intent";
+//import { Platform } from "react-native";
+import { Linking } from "react-native";
 
 const ModalComponent = () => {
   const { cart, setCart, buyProducts } = useContext(DataContext);
@@ -29,6 +32,35 @@ const ModalComponent = () => {
     // Add logic to handle the purchase
     setPurchasing(true);
 
+    // Enviar mensaje de WhatsApp con la lista del carrito
+    const message = `Pedido realizado con éxito! Total: $${total}\n\nProductos:\n${cart
+      .map((item) => `${item.productName} - Cantidad: ${item.quanty} - Precio: $${item.quanty * item.price}`)
+      .join("\n")}`;
+
+    const whatsappURL = `https://wa.me/+5214921445179?text=${encodeURIComponent(message)}`;
+    Linking.canOpenURL("https://wa.me/+5214921445179")
+      .then((supported) => {
+        if (supported) {
+          return Linking.openURL(whatsappURL);
+        } else {
+          console.log("whatsapp no instalado");
+        }
+      })
+      .catch((error) => {
+        console.error("error al intentar abrir whatsapp", error);
+      });
+
+    /*
+    
+        if (Platform.OS === 'android') {
+          const SendIntentAndroid = require('react-native-send-intent');
+          SendIntentAndroid.sendText({
+            text: message,
+            type: SendIntentAndroid.TEXT_PLAIN,
+            phone: "+5214921445179",
+          });
+        }
+    */
     // Reiniciar el carrito
     setCart([]);
     setCartOpen(false); // Cerrar el carrito después de la compra
@@ -97,14 +129,13 @@ const ModalComponent = () => {
             )}
 
             {/* Display purchase success message */}
-            {purchasing && <Text style={styles.purchaseSuccess}>Compra realizada con éxito!</Text>}
+            {purchasing && <Text style={styles.purchaseSuccess}>Pedido realizado con éxito!</Text>}
           </View>
         </View>
       </Modal>
     </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   centeredView: {
@@ -203,4 +234,5 @@ const styles = StyleSheet.create({
     color: "#1bcb7f",
   },
 });
+
 export default ModalComponent;

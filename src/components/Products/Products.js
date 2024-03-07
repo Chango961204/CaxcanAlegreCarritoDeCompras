@@ -51,7 +51,7 @@ const Products = () => {
         id: 6,
         productName: "Curado",
         price: 75,
-        img: "https://scontent.fzcl4-1.fna.fbcdn.net/v/t1.6435-9/136956612_806250436596382_5419239349839354810_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=810d5f&_nc_ohc=4Biyf8FfYA8AX9x540c&_nc_ht=scontent.fzcl4-1.fna&oh=00_AfBtz4qLLvhzfwzgE1FN6uTSfGg09rYEEhItwd-HZpw&oe=660EDE15",
+        img: "https://scontent.fzcl4-1.fna.fbcdn.net/v/t39.30808-6/342206322_731818238677618_4535148659133752881_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=5f2048&_nc_ohc=ymMLvq-03z4AX-Snohb&_nc_ht=scontent.fzcl4-1.fna&oh=00_AfCEvOXehC3t3qgU_IqkrXY6ojAJKblIpQ3rJvBT-cSm3A&oe=65EE9ADA",
       },
     ],
     sinAlcohol: [
@@ -64,7 +64,7 @@ const Products = () => {
 
       {
         id: 8,
-        productName: "",
+        productName: "Bebida sin Alcohol",
         price: 25,
         img: "https://http2.mlstatic.com/D_NQ_NP_989668-MLM73991428533_012024-O.webp",
       },
