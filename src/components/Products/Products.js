@@ -64,7 +64,7 @@ const Products = () => {
 
       {
         id: 8,
-        productName: "Bebida sin Alcohol",
+        productName: "",
         price: 25,
         img: "https://http2.mlstatic.com/D_NQ_NP_989668-MLM73991428533_012024-O.webp",
       },

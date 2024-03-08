@@ -1,8 +1,6 @@
 import React, { useState, useContext } from "react";
-import { Modal, StyleSheet, Text, Pressable, View, FlatList, Button } from "react-native";
+import { Modal, StyleSheet, Text, Pressable, View, FlatList, Button, Animated } from "react-native";
 import { DataContext } from "../Context/DataContext";
-//import SendIntentIos from "react-native-send-intent";
-//import { Platform } from "react-native";
 import { Linking } from "react-native";
 
 const ModalComponent = () => {
@@ -10,11 +8,26 @@ const ModalComponent = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [purchasing, setPurchasing] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+  const cartAnimation = new Animated.Value(0);
 
   const total = cart.reduce((acc, el) => acc + el.quanty * el.price, 0);
 
   const handleBuyPress = (product) => {
     buyProducts(product);
+
+    // Animación del carrito
+    Animated.sequence([
+      Animated.timing(cartAnimation, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: false,
+      }),
+      Animated.timing(cartAnimation, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: false,
+      }),
+    ]).start();
   };
 
   const handleDecreasePress = (product) => {
@@ -29,7 +42,7 @@ const ModalComponent = () => {
   };
 
   const handlePurchasePress = () => {
-    // Add logic to handle the purchase
+    // Lógica para realizar la compra
     setPurchasing(true);
 
     // Enviar mensaje de WhatsApp con la lista del carrito
@@ -43,24 +56,13 @@ const ModalComponent = () => {
         if (supported) {
           return Linking.openURL(whatsappURL);
         } else {
-          console.log("whatsapp no instalado");
+          console.log("WhatsApp no está instalado");
         }
       })
       .catch((error) => {
-        console.error("error al intentar abrir whatsapp", error);
+        console.error("Error al intentar abrir WhatsApp", error);
       });
 
-    /*
-    
-        if (Platform.OS === 'android') {
-          const SendIntentAndroid = require('react-native-send-intent');
-          SendIntentAndroid.sendText({
-            text: message,
-            type: SendIntentAndroid.TEXT_PLAIN,
-            phone: "+5214921445179",
-          });
-        }
-    */
     // Reiniciar el carrito
     setCart([]);
     setCartOpen(false); // Cerrar el carrito después de la compra
@@ -86,7 +88,8 @@ const ModalComponent = () => {
         visible={modalVisible}
         onRequestClose={() => {
           setModalVisible(false);
-        }}>
+        }}
+      >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <Pressable style={[styles.button, styles.buttonClose]} onPress={handleModalToggle}>
@@ -119,7 +122,7 @@ const ModalComponent = () => {
                   </Text>
                 </View>
               )}
-              keyExtractor={(item) => item.id}
+              keyExtractor={(item) => item.id.toString()}
             />
             <Text style={styles.totalText}>Total: ${total}</Text>
 
@@ -133,6 +136,24 @@ const ModalComponent = () => {
           </View>
         </View>
       </Modal>
+      {/* Animación del carrito */}
+      <Animated.View
+        style={{
+          position: "absolute",
+          bottom: 30,
+          right: 10,  // Cambiado para mover el carrito a la esquina inferior derecha
+          transform: [
+            {
+              translateY: cartAnimation.interpolate({
+                inputRange: [0, 1],
+                outputRange: [-100, 0],
+              }),
+            },
+          ],
+        }}
+      >
+        <Text style={styles.cartBadge}>{cart.length}</Text>
+      </Animated.View>
     </View>
   );
 };
@@ -181,14 +202,14 @@ const styles = StyleSheet.create({
   },
   modalButton: {
     position: "fixed",
-    bottom: 30,
-    left: 150,
+    bottom: 50,
+    left: 150,  // Cambiado para mover el carrito a la esquina inferior derecha
     backgroundColor: "#333",
     padding: 10,
     borderRadius: 30,
   },
   cartIcon: {
-    fontSize: 20,
+    fontSize: 25,
     color: "#fff",
   },
   cartItem: {
@@ -232,6 +253,18 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 18,
     color: "#1bcb7f",
+  },
+  cartBadge: {
+    backgroundColor: "#1bcb7f",
+    color: "#fff",
+    padding: 6,
+    borderRadius: 200,
+    textAlign: "center",
+    width: 20,
+    position: "absolute",
+    top: 1,
+    left: 130,
+    zIndex: 1,
   },
 });
 
